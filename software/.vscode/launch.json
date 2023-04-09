@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Pico Debug",
+      "type": "cortex-debug",
+      "cwd": "${workspaceRoot}",
+      "executable": "${command:cmake.launchTargetPath}",
+      "request": "launch",
+      "servertype": "openocd",
+      "configFiles": [
+        "interface/picoprobe.cfg",
+        "target/rp2040.cfg"
+      ],
+      "gdbPath" : "arm-none-eabi-gdb",
+      "device": "RP2040",
+      "svdFile": "${env:PICO_SDK_PATH}/src/rp2040/hardware_regs/rp2040.svd",
+      "runToEntryPoint": "main",
+      // Work around for stopping at main on restart
+      "postRestartCommands": [
+          "break main",
+          "continue"
+      ],
+    }
+  ]
+}
