@@ -1,3 +1,5 @@
 software/build
 electronics/pico-joystick-backups
 software/.vscode/.*
+electronics/fp-info-cache
+electronics/*.bak
