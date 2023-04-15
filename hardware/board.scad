@@ -11,8 +11,17 @@ pcb_y = 70;
 pcb_z = 1.6;
 
 // Inset of PCB holes from edges. Y inset for lower holes is larger due to DSub
+pcb_hole_diameter = 3.2; 
 pcb_hole_offset = 5;
 pcb_socket_hole_offset = 17;
+
+// Distance between DSub back edge and board bottom edge
+pcb_dsub_y_offset = 12.48;
+
+// Vertical position of Pi Pico
+pcb_pico_mount_height = 2.5;
+// Distance between Pico top edge and board top edge
+pcb_pico_y_offset = 0.76;
 
 // Locates child objects at the board mounting hole centres
 module board_hole_positions() {
@@ -32,12 +41,15 @@ module board_hole_positions() {
     }
 }
 
+// Locates child objects at the Pi Pico mount position
+module board_pico_position(){
+    translate([0, ((pcb_y - pico_y) / 2) - pcb_pico_y_offset, ((pico_z + pcb_z) / 2) + pcb_pico_mount_height]){
+        children();
+    }  
+}
+
 // Rough volume model of the Pico Joystick PCB
-// hole_diameter: mounting hole size
-// pico_mount_height: vertical position of Pi Pico
-// pico_y_offset: distance between Pico top edge and board top edge
-// dsub_y_offset: distance between DSub back edge and board bottom edge
-module board_volume(hole_diameter=3.2, pico_mount_height = 2.5, pico_y_offset = 0.76, dsub_y_offset = 12.48) {
+module board_volume() {
     union() {
         difference() {
             // Main PCB body
@@ -45,11 +57,11 @@ module board_volume(hole_diameter=3.2, pico_mount_height = 2.5, pico_y_offset = 
             
             // PCB mounting holes
             board_hole_positions() {
-                cylinder(pcb_z * 2, hole_diameter / 2, hole_diameter / 2, center = true, $fn=50);
+                cylinder(pcb_z * 2, pcb_hole_diameter / 2, pcb_hole_diameter / 2, center = true, $fn=50);
             }
             
             // Pico mounting holes
-            translate([0, ((pcb_y - pico_y) / 2) - pico_y_offset, 0]){            
+            translate([0, ((pcb_y - pico_y) / 2) - pcb_pico_y_offset, 0]){            
                 pico_holes() {
                     cylinder(pcb_z * 2, pico_hole_d / 2, pico_hole_d / 2, center = true, $fn=50);
                 }
@@ -57,12 +69,12 @@ module board_volume(hole_diameter=3.2, pico_mount_height = 2.5, pico_y_offset = 
         }
         
         // Pico volume model
-        translate([0, ((pcb_y - pico_y) / 2) - pico_y_offset, ((pico_z + pcb_z) / 2) + pico_mount_height]){
+        board_pico_position(){
             pico();
         }
         
         // DSub volume model
-        translate([0, dsub_y_offset - (dsub_body_y + pcb_y) / 2, (dsub_body_z + pcb_z) / 2]){
+        translate([0, pcb_dsub_y_offset - (dsub_body_y + pcb_y) / 2, (dsub_body_z + pcb_z) / 2]){
             rotate([0, 0, 180]) {
                 dsub_volume();
             }   
