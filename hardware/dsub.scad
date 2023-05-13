@@ -5,13 +5,15 @@
 
 // Socket hole dimensions
 dsub_plug_width = 27;
-dsub_plug_height = 8.36;
+dsub_plug_height = 9.7;
 dsub_mount_hole_separation = 33.32;
 
 // Socket body dimensions
 dsub_body_x = 39.1;
 dsub_body_y = 20.6 - 5.84;
-dsub_body_z = 12.55;
+dsub_body_z = 13.7;
+
+dsub_plug_offset_z = 7.6;
 
 
 // Generates three volumes which correspond to the DSub shell and mounting holes
@@ -48,7 +50,7 @@ module dsub_volume(dsub_hole_depth = 5.84) {
     union(){
         cube([dsub_body_x, dsub_body_y, dsub_body_z], center = true);
         
-        translate([0, (dsub_body_y + dsub_hole_depth) / 2, 0]){
+        translate([0, (dsub_body_y + dsub_hole_depth) / 2, dsub_plug_offset_z - dsub_body_z/2]){ 
             rotate([90, 0, 0]){
                 dsub_hole(dsub_hole_depth);
             }

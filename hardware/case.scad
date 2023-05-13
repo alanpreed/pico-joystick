@@ -8,10 +8,11 @@ include <utilities.scad>;
 
 // Lower PCB support pillars
 case_lower_pillar_z = 4;
-case_lower_pillar_r = 6;
+case_lower_pillar_r = 5;
 
 // Lid pillars
 case_upper_pillar_r = 4;
+case_upper_pillar_clearance_z = 0.2;
 
 // Threaded inserts in lid pillars
 case_threaded_insert_d = 3.7;
@@ -31,13 +32,16 @@ case_usb_hole_z = pico_usb_z + case_usb_clearance;
 
 // Case assembly bolt holes
 case_bolt_hole_d = pcb_hole_diameter;
-case_countersink_depth = 1.8;
+case_countersink_depth = 2.25;
 
 // Case lid features
 case_lid_insert_depth = 1.5;
 case_lid_leeway = 0.2;
-case_text_depth = 0.6;
+case_text_size = 5;
+case_text_depth = 0.8;
 case_text_separation = 30;
+
+case_dsub_hole_d = 5.5;
 
 
 // Moves child to the same position as the PCB will be fitted
@@ -86,10 +90,10 @@ module case_body() {
         // DSub entry hole
         hole_depth = case_wall_thickness * 2;
         
-        translate([0, - ((pcb_y + hole_depth) / 2 + (dsub_body_y - pcb_dsub_y_offset)), (dsub_body_z + pcb_z) / 2]){
+        translate([0, - ((pcb_y + hole_depth) / 2 + (dsub_body_y - pcb_dsub_y_offset)), dsub_plug_offset_z + (pcb_z / 2)]){
             case_pcb_position(){
                 rotate([90, 0, 0]){
-                    dsub_hole(hole_depth);
+                    dsub_hole(hole_depth, mount_hole_diameter = case_dsub_hole_d);
                 }
             }
         }
@@ -123,19 +127,19 @@ module case_lid() {
                     
                     translate([0, case_text_separation / 2, 0]){
                         linear_extrude(case_text_depth + 0.001){ // Small extra prevents artifacts
-                            text("Pico Joystick", font = "Noto Sans:style=Bold", halign="center", size=4);
+                            text("Pico Joystick", font = "Noto Sans:style=Bold", halign="center", size=case_text_size);
                         }
                     }
                     translate([0, -case_text_separation / 2, 0]){
                         linear_extrude(case_text_depth + 0.001){ // Small extra prevents artifacts
-                            text("Alan Reed", font = "Noto Sans:style=Bold", halign="center", size=4);
+                            text("Alan Reed", font = "Noto Sans:style=Bold", halign="center", size=case_text_size);
                         }
                     }
                 }
             }
             
             // Mounting pillars
-            upper_pillar_z = case_inner_z - case_lower_pillar_z - pcb_z;
+            upper_pillar_z = case_inner_z - case_lower_pillar_z - pcb_z - case_upper_pillar_clearance_z;
             case_pcb_position(){
                 board_hole_positions() {
                     translate([0, 0, -(case_wall_thickness + upper_pillar_z) / 2 - (case_lower_pillar_z - (case_inner_z - pcb_z) / 2)]){
@@ -172,7 +176,7 @@ module case_lid() {
 // Display exploded view of case, PCB and lid
 case_body();
 
-translate([0, 0, 50]){
+translate([0, 0, 40]){
     case_pcb_position(){
         color("green") {
             board_volume();
@@ -180,7 +184,6 @@ translate([0, 0, 50]){
     }
 }
 
-translate([0, 0, 100]){
+translate([0, 0, 70]){
     case_lid();
 }
-
