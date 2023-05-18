@@ -6,6 +6,7 @@
 
 #include "joystick.h"
 
+#include "buffer.h"
 #include "hardware/adc.h"
 #include "hardware/gpio.h"
 #include "hardware/irq.h"
@@ -37,6 +38,8 @@
 //-----------------------------------------------------------------------------
 
 static joystick_state_t state = {false, false, 0, 0};
+static buffer_t x_buffer;
+static buffer_t y_buffer;
 
 //-----------------------------------------------------------------------------
 // Private functions
@@ -75,14 +78,17 @@ void adc_irq() {
   uint16_t val_x = adc_fifo_get();
   uint16_t val_y = adc_fifo_get();
 
-  state.x_axis = convert_adc_value_to_resistance(val_x);
-  state.y_axis = convert_adc_value_to_resistance(val_y);
+  buffer_write(&x_buffer, convert_adc_value_to_resistance(val_x));
+  buffer_write(&y_buffer, convert_adc_value_to_resistance(val_y));
 }
 
 //-----------------------------------------------------------------------------
 // Public functions
 //-----------------------------------------------------------------------------
 void joystick_init() {
+  buffer_init(&x_buffer);
+  buffer_init(&y_buffer);
+
   // Button setup
   gpio_init(JOYSTICK_BUTTON_1_PIN);
   gpio_init(JOYSTICK_BUTTON_2_PIN);
@@ -121,6 +127,9 @@ void joystick_init() {
 }
 
 void joystick_read(joystick_state_t *state_buffer) {
+  state.x_axis = buffer_average(&x_buffer);
+  state.y_axis = buffer_average(&y_buffer);
+
   memcpy(state_buffer, &state, sizeof(state));
 }
 

@@ -17,6 +17,7 @@ target_sources(${PROJECT_NAME} PUBLIC
         ${CMAKE_CURRENT_LIST_DIR}/usb_callbacks.c
         ${CMAKE_CURRENT_LIST_DIR}/usb_hid.c
         ${CMAKE_CURRENT_LIST_DIR}/joystick.c
+        ${CMAKE_CURRENT_LIST_DIR}/buffer.c
         )
 
 # Make sure TinyUSB can find tusb_config.h

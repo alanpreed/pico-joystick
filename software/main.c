@@ -7,9 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "joystick.h"
 #include "pico/time.h"
 #include "tusb.h"
-#include "joystick.h"
 #include "usb_hid.h"
 
 //-----------------------------------------------------------------------------
